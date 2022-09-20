@@ -32,7 +32,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </JFXButton>
-      <JFXButton buttonType="RAISED" layoutX="358.0" layoutY="545.0" onAction="#DeliverItem" prefHeight="47.0" prefWidth="196.0" style="-fx-background-color: #277BC0; -fx-background-radius: 23;" text="DELIVER ORDER" textFill="WHITE">
+      <JFXButton buttonType="RAISED" layoutX="457.0" layoutY="546.0" onAction="#DeliverItem" prefHeight="47.0" prefWidth="196.0" style="-fx-background-color: #277BC0; -fx-background-radius: 23;" text="DELIVER ORDER" textFill="WHITE">
          <font>
             <Font name="Franklin Gothic Book" size="20.0" />
          </font>
@@ -42,6 +42,11 @@
             <Image url="@../../../../../../../Documents/NetBeansProjects/Tasta/src/images/Image3.png" />
          </image>
       </ImageView>
+      <JFXButton fx:id="btnImprimer" buttonType="RAISED" layoutX="231.0" layoutY="545.0" onAction="#imprimer" prefHeight="47.0" prefWidth="196.0" style="-fx-background-color: #277BC0; -fx-background-radius: 23;" text="PRINT ORDERS" textFill="WHITE">
+         <font>
+            <Font name="Franklin Gothic Book" size="20.0" />
+         </font>
+      </JFXButton>
       
    </children>
 </AnchorPane>

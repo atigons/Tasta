@@ -22,21 +22,31 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import javax.swing.SwingUtilities;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JRDesignQuery;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JRViewer;
+import net.sf.jasperreports.view.JasperViewer;
+import org.controlsfx.control.Notifications;
 
 /**
  * FXML Controller class
@@ -69,6 +79,10 @@ public class TakeOrderController implements Initializable {
     Connection con;
     
     ObservableList<ModelTable2> obList= FXCollections.observableArrayList();
+    @FXML
+    private JFXButton logout;
+    @FXML
+    private JFXButton btnImprimer;
     
     public TakeOrderController(){
         con=SqlConnection.Connector();
@@ -118,6 +132,7 @@ public void tableConnection(){
             Logger.getLogger(TakeOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    @FXML
  public void DeliverItem(ActionEvent event){
        ModelTable2 tableIndex = (ModelTable2)table.getSelectionModel().getSelectedItem();
        int tempOrderid = -1;
@@ -135,20 +150,23 @@ public void tableConnection(){
                pst = con.prepareStatement(query);
                pst.setInt(1, tempOrderid);
                pst.execute();
-               infoBox1("order delivered",null, "Success");
+              // infoBox1("order delivered",null, "Success");
                table.getItems().remove(tableIndex);
                table.refresh();
                table.getSelectionModel().clearSelection();
-               Stage primaryStage =new Stage();
-                primaryStage.initStyle(StageStyle.UNDECORATED);
-		Parent root =FXMLLoader.load(getClass().getResource("Login.fxml"));
-		Scene scene = new Scene(root);
-		primaryStage.setScene(scene);
-		primaryStage.show();
+               Notifications notif = Notifications.create()
+                        .text("order has been delivered ☻ ")
+                        .graphic(null)
+                        .hideAfter(Duration.seconds(3))
+                        .position(Pos.TOP_RIGHT)
+                        .onAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                System.out.println("Cliched notification"); //To change body of generated methods, choose Tools | Templates.
+                            }
+                        });
                 
-            // Hide this current window (if this is what you want)
-            ((Node)(event.getSource())).getScene().getWindow().hide();
-               
+                notif.showConfirm();
                
               
            } catch (SQLException ex) {
@@ -159,7 +177,7 @@ public void tableConnection(){
                
        
     } else {
-        System.out.println("no selction made");
+        System.out.println("no selection made");
     }
 }
       public static boolean infoBox(String infoMessage, String headerText, String title){
@@ -190,19 +208,26 @@ public void tableConnection(){
      public  void Logout(ActionEvent event){
          System.exit(0);
      }
+
+
+
+    @FXML
+    private void imprimer(ActionEvent event) {
+        JasperReport jReport;
+        String path = ".C:\\Users\\saife\\Desktop\\Nouveau dossier (4)\\projectfinal\\src\\edu\\tasta\\gui\\report1.jasper";
+        try {
+            jReport = (JasperReport) JRLoader.loadObjectFromFile(path);
+            JasperPrint jprint = JasperFillManager.fillReport(path, null, con);
+            JasperViewer jviewer = new JasperViewer(jprint, false);
+            jviewer.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            jviewer.setVisible(true);
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+ 
+    }
+    }
     
     
-     @FXML
-     public void loginScreen3(ActionEvent event) throws Exception  {
-		Stage primaryStage =new Stage();
-                primaryStage.initStyle(StageStyle.UNDECORATED);
-		Parent root =FXMLLoader.load(getClass().getResource("AdminPanel.fxml"));
-		Scene scene = new Scene(root);
-		primaryStage.setScene(scene);
-		primaryStage.show();
-                
-            // Hide this current window (if this is what you want)
-            ((Node)(event.getSource())).getScene().getWindow().hide();
-	}
     
-}
