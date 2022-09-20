@@ -6,7 +6,6 @@
 package edu.tasta.gui;
 import edu.tasta.services.PaymentModel;
 import com.jfoenix.controls.JFXRadioButton;
-import static edu.tasta.gui.MenuController.i;
 import edu.tasta.tools.SqlConnection;
 import static edu.tasta.gui.MenuController.i;
 import java.io.IOException;
@@ -16,9 +15,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +31,18 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.stage.StageStyle;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 /**
  * FXML Controller class
@@ -64,7 +73,8 @@ public class PaymentController implements Initializable {
 
     @FXML
     private TextField yeartxt;
-
+ @FXML
+    private TextField emailtxt1;
     @FXML
     private PasswordField cvvtxt;
     @FXML
@@ -121,8 +131,51 @@ public class PaymentController implements Initializable {
                 
             // Hide this current window (if this is what you want)
             ((Node)(event.getSource())).getScene().getWindow().hide();
-	}
-    public void cashOnDelivery(ActionEvent event){
+           String host="atig.ons@esprit.tn";  //← my email address
+                     final String user="atig.ons@esprit.tn";//← my email address
+                     final String password="E13258828";//change accordingly   //← my email password
+                     String to=emailtxt1.getText();//→ the EMAIL i want to send TO →
+                     // session object
+                     Properties props = new Properties();
+                     props.put("mail.smtp.ssl.trust", "*");
+                     props.put("mail.smtp.auth", "true");
+                     props.put("mail.smtp.port", "587");
+                     props.put("mail.smtp.host", "smtp.gmail.com");
+                     props.put("mail.smtp.starttls.enable", "true");
+                     Session session = Session.getDefaultInstance(props,
+                             new javax.mail.Authenticator() {
+                                 @Override
+                                 
+                                 protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+                                     return new PasswordAuthentication(user,password);
+                                 }
+                             });
+                     //My message :
+                     try {
+                         MimeMessage message = new MimeMessage(session);
+                         message.setFrom(new InternetAddress(user));
+                         message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
+                         message.setSubject(" ORDER HAS BEEN CONFIRMED !!! ");
+                         //Text in emial :
+                         //message.setText("  → Text message for Your Appointement ← ");
+                         //Html code in email :
+                         
+                         message.setContent(
+                                 "<h1 style =\"color:red\" >YOU JUST ORDERED !! </h1> <br/> <img width=\"50%\" height=\"50%\" src=https://i.imgur.com/iYcBkOf.png>",
+                                 "text/html");
+                         
+                         //send the message
+                         Transport.send(message);
+                         
+                         System.out.println("message sent successfully via mail ... !!! ");
+                         
+                     } catch (MessagingException e) {e.printStackTrace();}
+             
+ 
+
+       
+    }	
+   public void cashOnDelivery(ActionEvent event){
         cardnumtxt.setDisable(true);
         cardholdertxt.setDisable(true);
         cvvtxt.setDisable(true);
@@ -145,6 +198,7 @@ public class PaymentController implements Initializable {
         cvvtxt.setDisable(false);
         monthtxt.setDisable(false);
         yeartxt.setDisable(false);
+        emailtxt1.setDisable(false);
         String query="UPDATE payment SET payment.payment_type='ONLINE_PAYMENT' WHERE payment.payment_status='NOT_CONFIRMED' and order_id IN(SELECT order_id from orders WHERE orders.order_id=payment.order_id and customer_id=?)";
          PreparedStatement pst;
          try {
@@ -155,7 +209,7 @@ public class PaymentController implements Initializable {
              Logger.getLogger(PaymentController.class.getName()).log(Level.SEVERE, null, ex);
          }
     }
-    public void confirmPayment(ActionEvent event){
+public void confirmPayment(ActionEvent event) throws AddressException, MessagingException{
          try {
              if(paymentModel.isPaymentOnline()){
                  if(!(cardnumtxt.getText().isEmpty()||cardholdertxt.getText().isEmpty()||cvvtxt.getText().isEmpty()||monthtxt.getText().isEmpty()||yeartxt.getText().isEmpty())){
@@ -185,18 +239,48 @@ public class PaymentController implements Initializable {
                      paymentModel.update_status_to_payment_confirmed();
                      infoBox1("Payment Sucessfull", null, "sucess");
                      }
-                     
+//                     
+                     String host="atig.ons@esprit.tn";  //← my email address
+                     final String user="atig.ons@esprit.tn";//← my email address
+                     final String password="E13258828";//change accordingly   //← my email password
+                     String to=emailtxt1.getText();//→ the EMAIL i want to send TO →
+                     // session object
+                     Properties props = new Properties();
+                     props.put("mail.smtp.ssl.trust", "*");
+                     props.put("mail.smtp.auth", "true");
+                     props.put("mail.smtp.port", "587");
+                     props.put("mail.smtp.host", "smtp.gmail.com");
+                     props.put("mail.smtp.starttls.enable", "true");
+                     Session session = Session.getDefaultInstance(props,
+                             new javax.mail.Authenticator() {
+                                 @Override
+                                 
+                                 protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+                                     return new PasswordAuthentication(user,password);
+                                 }
+                             });
+                     //My message :
                      try {
-                         Node node = (Node)event.getSource();
-                         Stage dialogStage = (Stage) node.getScene().getWindow();
-                         dialogStage.close();
-                         Scene scene;
-                         scene = new Scene(FXMLLoader.load(getClass().getResource("Confirmed.fxml")));
-                         dialogStage.setScene(scene);
-                         dialogStage.show();
-                     } catch (IOException ex) {
-                         Logger.getLogger(PaymentController.class.getName()).log(Level.SEVERE, null, ex);
-                     }
+                         MimeMessage message = new MimeMessage(session);
+                         message.setFrom(new InternetAddress(user));
+                         message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
+                         message.setSubject(" ORDER HAS BEEN CONFIRMED !!! ");
+                         //Text in emial :
+                         //message.setText("  → Text message for Your Appointement ← ");
+                         //Html code in email :
+                         
+                         message.setContent(
+                                 "<h1 style =\"color:red\" >YOU JUST ORDERED !! </h1> <br/> <img width=\"50%\" height=\"50%\" src=https://i.imgur.com/iYcBkOf.png>",
+                                 "text/html");
+                         
+                         //send the message
+                         Transport.send(message);
+                         
+                         System.out.println("message sent successfully via mail ... !!! ");
+                         
+                     } catch (MessagingException e) {e.printStackTrace();}
+        
+                 
                     
                  }else{
                      infoBox1("enter the payment details",null,"Alert!");

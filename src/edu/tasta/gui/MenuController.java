@@ -98,45 +98,6 @@ public class MenuController implements Initializable {
     private TableColumn<ModelTable1, String> OrderStatusCol1;
 
     
-
-    /*
-    @FXML
-    private JFXButton btn1;
-
-    @FXML
-    private JFXButton btn2;
-
-    @FXML
-    private JFXButton btn3;
-
-    @FXML
-    private JFXButton btn4;
-
-    @FXML
-    private JFXButton btn5;
-
-    @FXML
-    private JFXButton btn6;
-
-    @FXML
-    private JFXButton btn7;
-
-    @FXML
-    private JFXButton btn8;
-
-    @FXML
-    private JFXButton btn9;
-
-    @FXML
-    private JFXButton btn10;
-
-    @FXML
-    private JFXButton btn11;
-
-    @FXML
-    private JFXButton btn12;
-    */
-    
     Connection con; //connection for table 
     
     public static int i;
@@ -158,7 +119,10 @@ public class MenuController implements Initializable {
          totalAmount.setText("0");
         
          i= LoginController.cust_id;//customer id which is primary key
-         custLabel.setText(Integer.toString(i));
+//<<<<<<< HEAD
+       //  custLabel.setText(Integer.toString(i));
+//=======
+//>>>>>>> bb66ea2 (second commit)
          if(menuModel.isDbConnected()){
              System.out.println("Db connected");
         }else{
